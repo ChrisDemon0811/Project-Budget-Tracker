@@ -136,31 +136,25 @@ class BudgetTracker {
 			String cat = t.getCategory().toLowerCase();
 
 			// Tính tổng thu nhập và chi tiêu hiện tại
-			double totalIncome = transactions.stream().filter(tr -> tr.getType().equals("income"))
-					.mapToDouble(ThuNhap_ChiTieu::getAmount).sum();
+			double totalIncome = transactions.stream().filter(tr -> tr.getType().equals("income")).mapToDouble(ThuNhap_ChiTieu::getAmount).sum();
 
-			double totalExpense = transactions.stream().filter(tr -> tr.getType().equals("expense"))
-					.mapToDouble(ThuNhap_ChiTieu::getAmount).sum();
+			double totalExpense = transactions.stream().filter(tr -> tr.getType().equals("expense")).mapToDouble(ThuNhap_ChiTieu::getAmount).sum();
 
 			double soDuHienCo = totalIncome - totalExpense;
 
 			// Kiểm tra số dư hiện tại
 			if (t.getAmount() > soDuHienCo) {
-				System.out.println("Giao dịch không thành công: Bạn không đủ tiền. Số dư hiện tại chỉ còn "
-						+ formatter.format(soDuHienCo) + " VND.");
+				System.out.println("Giao dịch không thành công: Bạn không đủ tiền. Số dư hiện tại chỉ còn " + formatter.format(soDuHienCo) + " VND.");
 				return false;
 			}
 
 			// Kiểm tra vượt ngân sách theo danh mục
-			double spent = transactions.stream()
-					.filter(tr -> tr.getType().equals("expense") && tr.getCategory().equalsIgnoreCase(cat))
-					.mapToDouble(ThuNhap_ChiTieu::getAmount).sum();
+			double spent = transactions.stream().filter(tr -> tr.getType().equals("expense") && tr.getCategory().equalsIgnoreCase(cat)).mapToDouble(ThuNhap_ChiTieu::getAmount).sum();
 			double limit = budgets.containsKey(cat) ? budgets.get(cat).getLimitAmount() : Double.MAX_VALUE;
 
 			if (spent + t.getAmount() > limit) {
 				double nganSachConLai = limit - spent;
-				System.out.println("Giao dịch không thành công vì chi tiêu '" + t.getCategory()
-						+ "' vượt quá ngân sách (" + formatter.format(limit) + " VND)");
+				System.out.println("Giao dịch không thành công vì chi tiêu '" + t.getCategory() + "' vượt quá ngân sách (" + formatter.format(limit) + " VND)");
 				System.out.println("Ngân sách bạn còn: " + formatter.format(nganSachConLai) + " VND");
 				return false;
 			}
