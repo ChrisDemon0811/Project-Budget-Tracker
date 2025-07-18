@@ -78,7 +78,7 @@ class BudgetTracker {
 	public void addTransaction(ThuNhap_ChiTieu t) {
 		transactions.add(t);
 	}
-
+	//lưu dữ liệu được truyền vào
 	public void setBudget(String category, double limit) {
 		budgets.put(category.toLowerCase(), new NganSach(category, limit));
 	}
@@ -163,7 +163,62 @@ class BudgetTracker {
 		transactions.add(t);
 		return true;
 	}
+	
+	public void loadFromFile(String filename) {
+	    try (Scanner fileScanner = new Scanner(new java.io.File(filename))) {
+	        while (fileScanner.hasNextLine()) {
+	            String line = fileScanner.nextLine();
+	            String[] parts = line.split(",");
+	            if (parts.length == 4) {
+	                String type = parts[0];
+	                String category = parts[1];
+	                double amount = Double.parseDouble(parts[2]);
+	                LocalDateTime dateTime = LocalDateTime.parse(parts[3]);
+	                transactions.add(new ThuNhap_ChiTieu(category, amount, type, dateTime));
+	            }
+	        }
+	    } catch (Exception e) {
+	        System.out.println("Không thể đọc file: " + e.getMessage());
+	    }
+	}
 
+	public void saveToFile(String filename) {
+	    try (java.io.PrintWriter writer = new java.io.PrintWriter(new java.io.FileWriter(filename))) {
+	        for (ThuNhap_ChiTieu t : transactions) {
+	            writer.println(t.getType() + "," + t.getCategory() + "," + t.getAmount() + "," + t.getDateTime());
+	        }
+	    } catch (Exception e) {
+	        System.out.println("Không thể ghi file: " + e.getMessage());
+	    }
+	}
+
+	public void loadBudgets(String filename) {
+	    try (Scanner fileScanner = new Scanner(new java.io.File(filename))) {
+	        while (fileScanner.hasNextLine()) {
+	            String line = fileScanner.nextLine();
+	            String[] parts = line.split(",");
+	            if (parts.length == 2) {
+	                String category = parts[0];
+	                double limit = Double.parseDouble(parts[1]);
+	                budgets.put(category.toLowerCase(), new NganSach(category, limit));
+	            }
+	        }
+	    } catch (Exception e) {
+	        System.out.println("Không thể đọc ngân sách: " + e.getMessage());
+	    }
+	}
+
+	public void saveBudgets(String filename) {
+	    try (java.io.PrintWriter writer = new java.io.PrintWriter(new java.io.FileWriter(filename))) {
+	        for (NganSach b : budgets.values()) {
+	            writer.println(b.getCategory() + "," + b.getLimitAmount());
+	        }
+	    } catch (Exception e) {
+	        System.out.println("Không thể ghi ngân sách: " + e.getMessage());
+	    }
+	}
+
+	
 }
 
 public class Project {
@@ -171,6 +226,8 @@ public class Project {
 	public static void main(String[] args) {
 		// Điểm mở đầu của chương trình
 		BudgetTracker tracker = new BudgetTracker();
+		tracker.loadFromFile("giaodich.txt"); // đọc dữ liệu giao dịch từ file khi khởi động
+		tracker.loadBudgets("ngansach.txt"); // đọc dữ liệu thiết lập ngân sách từ file khởi động 
 		// Tạo công cụ theo dõi ngân sách(budget tracker)
 		Scanner scanner = new Scanner(System.in);
 		// Tạo công cụ đọc dữ liệu người dùng từ bàn phím
@@ -215,6 +272,7 @@ public class Project {
 				// Tạo đối tượng ThuNhap_ChiTieu(category, amount, type) truyền cho tracker
 				if (success) {
 					System.out.println("Giao dịch thành công.");
+					tracker.saveToFile("giaodich.txt"); // lưu dữ liệu giao dịch vào file sau khi thêm
 				}
 				// nếu success thì in ra giao dịch thành công
 
@@ -230,6 +288,7 @@ public class Project {
 				tracker.setBudget(category, limit);
 				// Lưu hạn mức
 				System.out.println("Ngân sách đã thiết lập.");
+				tracker.saveBudgets("ngansach.txt"); //lưu dữ liệu ngân sách đã thiết lập vào file
 			}
 			case 3 -> tracker.output();
 			// Hiển thị kết quả của case 1 và case 2
