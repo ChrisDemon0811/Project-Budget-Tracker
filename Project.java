@@ -198,14 +198,14 @@ class BudgetTracker {
 
 	//đọc dữ liệu từ file ngansach.txt khi khởi động 
 	public void loadBudgets(String filename) {
-	    try (Scanner fileScanner = new Scanner(new java.io.File(filename))) {
+	    try (Scanner fileScanner = new Scanner(new java.io.File(filename))) { //mở file ngansach.txt để đọc dữ liệu, nếu ko có sẽ tự tạo
 	        while (fileScanner.hasNextLine()) {
 	            String line = fileScanner.nextLine();
-	            String[] parts = line.split(",");
+	            String[] parts = line.split(","); //mỗi dòng gồm 2 phần: category, limit
 	            if (parts.length == 2) {
 	                String category = parts[0];
 	                double limit = Double.parseDouble(parts[1]);
-	                budgets.put(category.toLowerCase(), new NganSach(category, limit));
+	                budgets.put(category.toLowerCase(), new NganSach(category, limit)); //tạo đối tượng Ngansach lưu vào budget
 	            }
 	        }
 	    } catch (Exception e) {
@@ -216,6 +216,7 @@ class BudgetTracker {
 	//ghi dữ liệu vào file ngansach.txt khi thêm giao dịch 
 	public void saveBudgets(String filename) {
 	    try (java.io.PrintWriter writer = new java.io.PrintWriter(new java.io.FileWriter(filename))) {
+		//ghi từng ngân sách theo dòng
 	        for (NganSach b : budgets.values()) {
 	            writer.println(b.getCategory() + "," + b.getLimitAmount());
 	        }
