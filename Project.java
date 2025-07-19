@@ -163,18 +163,20 @@ class BudgetTracker {
 		transactions.add(t);
 		return true;
 	}
-	
+
+	//đọc dữ liệu từ giaodich.txt khi khởi động
 	public void loadFromFile(String filename) {
-	    try (Scanner fileScanner = new Scanner(new java.io.File(filename))) {
-	        while (fileScanner.hasNextLine()) {
-	            String line = fileScanner.nextLine();
-	            String[] parts = line.split(",");
+	    try (Scanner fileScanner = new Scanner(new java.io.File(filename))) { //tạo đối tượng đọc file bằng scanner 
+	        while (fileScanner.hasNextLine()) { //duyệt từng line trong file, mỗi line là 1 giao dịch
+	            String line = fileScanner.nextLine(); 
+	            String[] parts = line.split(","); //tách dòng thành 4 phần: type, category, amount, dateTime
 	            if (parts.length == 4) {
+			//ép kiểu tử chuỗi sang dữ liệu
 	                String type = parts[0];
 	                String category = parts[1];
 	                double amount = Double.parseDouble(parts[2]);
 	                LocalDateTime dateTime = LocalDateTime.parse(parts[3]);
-	                transactions.add(new ThuNhap_ChiTieu(category, amount, type, dateTime));
+	                transactions.add(new ThuNhap_ChiTieu(category, amount, type, dateTime)); //tạo giao dịch mới và thêm vào danh sách transactions
 	            }
 	        }
 	    } catch (Exception e) {
@@ -182,8 +184,10 @@ class BudgetTracker {
 	    }
 	}
 
+	//ghi dữ liệu vào file giaodich.txt khi thêm giao dịch 
 	public void saveToFile(String filename) {
-	    try (java.io.PrintWriter writer = new java.io.PrintWriter(new java.io.FileWriter(filename))) {
+	    try (java.io.PrintWriter writer = new java.io.PrintWriter(new java.io.FileWriter(filename))) { //mở file ghi, nếu chưa có sẽ tự tạo 
+		//duyệt toàn bộ transactions, ghi từng giao dịch vào file giaodich.
 	        for (ThuNhap_ChiTieu t : transactions) {
 	            writer.println(t.getType() + "," + t.getCategory() + "," + t.getAmount() + "," + t.getDateTime());
 	        }
@@ -192,6 +196,7 @@ class BudgetTracker {
 	    }
 	}
 
+	//đọc dữ liệu từ file ngansach.txt khi khởi động 
 	public void loadBudgets(String filename) {
 	    try (Scanner fileScanner = new Scanner(new java.io.File(filename))) {
 	        while (fileScanner.hasNextLine()) {
@@ -208,6 +213,7 @@ class BudgetTracker {
 	    }
 	}
 
+	//ghi dữ liệu vào file ngansach.txt khi thêm giao dịch 
 	public void saveBudgets(String filename) {
 	    try (java.io.PrintWriter writer = new java.io.PrintWriter(new java.io.FileWriter(filename))) {
 	        for (NganSach b : budgets.values()) {
